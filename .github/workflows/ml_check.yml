@@ -9,10 +9,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
 
-    - name: Simulate ML scan (Replace with real API call later)
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: 📦 Install dependencies
       run: |
-        echo "Simulating ML scan..."
-        echo "ML verdict: Safe"
+        python -m pip install --upgrade pip
+        # Install only what ml_engine needs
+        pip install torch transformers
+
+    - name: 🧠 Run ML risk check
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        python .github/scripts/run_ml_check.py "$BASE_SHA" "$HEAD_SHA"
