@@ -1,1 +1,1 @@
-print("This is a safe commit!")
+print("This is a safe test file.")
