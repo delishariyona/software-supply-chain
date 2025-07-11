@@ -1,0 +1,31 @@
+name: ML Commit Risk Check
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ml-risk-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install torch transformers
+
+    - name: 🧠 Run ML risk check
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        python .github/scripts/run_ml_check.py "$BASE_SHA" "$HEAD_SHA"
+
