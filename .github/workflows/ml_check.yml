@@ -9,8 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout code
+    - name: 📥 Checkout code with full history
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Ensures both base and head commits are available
 
     - name: 🐍 Set up Python
       uses: actions/setup-python@v4
@@ -20,7 +22,6 @@ jobs:
     - name: 📦 Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # Install only what ml_engine needs
         pip install torch transformers
 
     - name: 🧠 Run ML risk check
@@ -28,4 +29,5 @@ jobs:
         BASE_SHA: ${{ github.event.pull_request.base.sha }}
         HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       run: |
+        echo "🔁 Running ML Commit Risk Check between $BASE_SHA and $HEAD_SHA"
         python .github/scripts/run_ml_check.py "$BASE_SHA" "$HEAD_SHA"
