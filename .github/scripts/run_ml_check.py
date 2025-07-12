@@ -11,8 +11,12 @@ GitHub Action helper that:
 
 import subprocess
 import sys
+import os
 import json
 from pathlib import Path
+
+# ✅ Add the project root to PYTHONPATH so 'utils' can be found
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 
 # ---------- 1.  Read commit SHAs from CLI ----------
 if len(sys.argv) != 3:
@@ -36,8 +40,7 @@ if not diff.strip():
     sys.exit(0)
 
 # ---------- 3.  Run your model ----------
-# Assumes utils.ml_engine exists in repo
-from utils.ml_engine import analyze_commit   # noqa: E402
+from utils.ml_engine import analyze_commit  # noqa: E402
 
 result = analyze_commit(diff, filenames)
 
@@ -45,12 +48,9 @@ print("🔍  ML analysis result:")
 print(json.dumps(result, indent=2))
 
 # ---------- 4.  Decide pass / fail ----------
-# Change this:
-if result["severity"].lower() == "high":
-    print("⚠️ High‑risk commit detected – skipping failure temporarily")
-    sys.exit(0)
-
-# Back to this:
 if result["severity"].lower() == "high":
     print("❌ High‑risk commit detected – failing status check.")
     sys.exit(1)
+
+print("✅ Commit considered safe enough – passing status check.")
+sys.exit(0)
